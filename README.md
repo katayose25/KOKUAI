@@ -37,8 +37,8 @@ Important: do not commit `.env`.
 Model adapters are loaded from Hugging Face by default:
 
 ```text
-LFM_AUDIO_CHECKPOINT_REPO=kinohito/koku-ai-asr-lora-jp
-LFM_CHART_LORA_REPO=kinohito/koku-ai-transcript-lora
+LFM_AUDIO_CHECKPOINT_REPO=katayose/koku-ai-asr-lora-jp
+LFM_CHART_LORA_REPO=katayose/koku-ai-transcript-lora
 ```
 
 If the repositories are private, set `HF_TOKEN` or run `huggingface-cli login` before starting the app.

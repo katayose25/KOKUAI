@@ -292,6 +292,7 @@ async def stream_asr(encounter_id: str) -> StreamingResponse:
                 if store.get_encounter(encounter_id).live_cancel_requested:
                     break
 
+                await asyncio.sleep(6.0)
                 yield _sse("turn_start", {
                     "speaker": turn.speaker,
                     "speaker_label": SPEAKER_LABELS.get(turn.speaker, "不明"),

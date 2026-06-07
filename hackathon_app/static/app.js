@@ -3,6 +3,7 @@
   let currentTurnRow = null;
   let liveSource = null;
   let syncMode = false;
+  let transcriptStickyBottom = true;
   const typewriterTimers = new WeakMap();
 
   function listAtBottom(list) {
@@ -10,7 +11,18 @@
   }
 
   function scrollListToBottom(list) {
-    list.scrollTop = list.scrollHeight;
+    requestAnimationFrame(function () {
+      if (transcriptStickyBottom) list.scrollTop = list.scrollHeight;
+    });
+  }
+
+  function bindTranscriptStickyScroll() {
+    const list = document.getElementById("transcript-list");
+    if (!list || list.dataset.stickyBound === "1") return;
+    list.dataset.stickyBound = "1";
+    list.addEventListener("scroll", function () {
+      transcriptStickyBottom = listAtBottom(list);
+    });
   }
 
   function scrollRowIntoList(list, row) {
@@ -142,7 +154,7 @@
     if (syncMode) {
       syncTranscriptAt(currentAudioTime());
     } else {
-      if (listAtBottom(list)) scrollListToBottom(list);
+      scrollListToBottom(list);
     }
   }
 
@@ -155,7 +167,7 @@
       syncTranscriptAt(currentAudioTime());
     } else {
       currentTurnText.textContent += piece;
-      if (listAtBottom(list)) scrollListToBottom(list);
+      scrollListToBottom(list);
     }
   }
 
@@ -333,15 +345,18 @@
     pollModelStatus();
     bindAudioTranscriptSync(document);
     initializeTranscriptReveal(document);
+    bindTranscriptStickyScroll();
   });
   document.addEventListener("htmx:afterSwap", function (event) {
     bindAudioTranscriptSync(event.target || document);
     initializeTranscriptReveal(document);
+    bindTranscriptStickyScroll();
   });
   if (document.readyState !== "loading") {
     pollModelStatus();
     bindAudioTranscriptSync(document);
     initializeTranscriptReveal(document);
+    bindTranscriptStickyScroll();
   }
 
 
