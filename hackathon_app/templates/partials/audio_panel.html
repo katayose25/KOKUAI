@@ -1,0 +1,28 @@
+<div id="audio-panel">
+  <form id="audio-upload-form-{{ encounter.id }}"
+        hx-post="/encounters/{{ encounter.id }}/audio" hx-target="#audio-panel" hx-swap="outerHTML"
+        enctype="multipart/form-data" class="flex items-center gap-3 px-4 pt-2 pb-3">
+    <label class="btn-secondary cursor-pointer flex-shrink-0">
+      ファイルを選択
+      <input type="file" name="audio" accept="audio/*,.wav,.mp3,.m4a" required class="sr-only"
+             onchange="if(this.files.length) this.closest('form').requestSubmit()">
+    </label>
+    <span class="ws-audio-filename">選択されていません</span>
+  </form>
+  {% if encounter.audio_sources %}
+  <div class="grid md:grid-cols-2 gap-3 px-4 pb-3">
+    {% for audio in encounter.audio_sources %}
+    <div class="rounded-lg border border-slate-200 bg-white p-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <div class="font-semibold truncate">{{ audio.filename }}</div>
+          <div class="text-xs text-slate-500">{{ audio.status }}</div>
+        </div>
+        <button class="icon-btn" hx-delete="/encounters/{{ encounter.id }}/audio/{{ audio.id }}" hx-target="#audio-panel" hx-swap="outerHTML">削除</button>
+      </div>
+      <audio class="encounter-audio mt-3 w-full" controls preload="metadata" src="/encounters/{{ encounter.id }}/audio/{{ audio.id }}/play"></audio>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

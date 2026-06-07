@@ -1,0 +1,23 @@
+<section id="vlm-panel" class="panel p-5 space-y-4">
+  <div class="flex items-center justify-between gap-4">
+    <div><h3 class="font-bold">画像・VLM所見</h3><p class="text-xs text-slate-500">患部画像を添付すると所見候補を表示します。</p></div>
+    <form hx-post="/encounters/{{ encounter.id }}/images" hx-target="#vlm-panel" hx-swap="outerHTML" enctype="multipart/form-data" class="flex items-center gap-2">
+      <label class="btn-secondary cursor-pointer flex-shrink-0">
+        画像を選択
+        <input type="file" name="image" accept="image/*" required class="sr-only"
+               onchange="if(this.files.length) this.closest('form').requestSubmit()">
+      </label>
+    </form>
+  </div>
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-3">
+    {% for image in encounter.images %}
+    <article class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div class="aspect-video rounded-md bg-white overflow-hidden border border-slate-200"><img src="/uploads/{{ encounter.id }}/{{ image.path.split('/')[-1] }}" class="w-full h-full object-cover" alt=""></div>
+      <p class="mt-3 text-sm">{{ image.finding }}</p>
+      <button class="mt-3 text-xs text-rose-600 font-semibold" hx-delete="/encounters/{{ encounter.id }}/images/{{ image.id }}" hx-target="#vlm-panel" hx-swap="outerHTML">削除</button>
+    </article>
+    {% else %}
+    <div class="empty-state md:col-span-2 xl:col-span-3">画像はまだありません。</div>
+    {% endfor %}
+  </div>
+</section>

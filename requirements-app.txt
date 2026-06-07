@@ -1,0 +1,23 @@
+fastapi>=0.115
+uvicorn[standard]>=0.34
+python-multipart>=0.0.20
+jinja2>=3.1
+pydantic>=2.7
+requests>=2.31
+
+# Model runtime used by the demo app.
+# For CUDA environments, install the torch/torchaudio wheels that match your CUDA
+# version first if pip's default wheels are not appropriate.
+torch>=2.5
+torchaudio>=2.5
+torchvision>=0.20
+transformers>=4.52
+accelerate>=1.0
+sentencepiece>=0.2
+soundfile>=0.12
+librosa>=0.10
+torchcodec>=0.1
+liquid-audio>=1.2.0
+huggingface-hub>=0.30
+peft>=0.13
+safetensors>=0.4

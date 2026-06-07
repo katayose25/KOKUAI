@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}カルテ{% endblock %}
+{% block body %}
+<div class="h-full overflow-y-auto bg-slate-100">
+<div class="max-w-5xl mx-auto p-6 lg:p-10">
+  <div class="paper">
+    <header class="flex items-start justify-between border-b border-slate-300 pb-5">
+      <div><h2 class="text-2xl font-bold">{{ patient.name }}</h2><p class="text-slate-600">{{ patient.age }}歳 / {{ {"male":"男性","female":"女性","other":"その他","unknown":"不明"}[patient.sex] }} / 第{{ encounter_number }}回</p></div>
+      <div class="text-right text-sm text-slate-500">{{ encounter.created_at[:10] }}</div>
+    </header>
+    {% if encounter.images %}
+    <section class="grid md:grid-cols-[180px_1fr] gap-4 py-5 border-b border-slate-200">
+      <div class="aspect-video rounded-md overflow-hidden border border-slate-200"><img class="w-full h-full object-cover" src="/uploads/{{ encounter.id }}/{{ encounter.images[0].path.split('/')[-1] }}" alt=""></div>
+      <div><p class="text-xs font-bold text-slate-500">画像所見</p><p>{{ encounter.images[0].finding }}</p></div>
+    </section>
+    {% endif %}
+    <section class="mt-6 space-y-5 text-[15px] leading-7">
+      <div class="soap-line"><b>S</b><p>{{ encounter.chart.subjective or "未作成" }}</p></div>
+      <div class="soap-line"><b>O</b><p>{{ encounter.chart.objective or "未作成" }}</p></div>
+      <div class="soap-line"><b>A</b><p>{{ encounter.chart.assessment or "未作成" }}</p></div>
+      <div class="soap-line"><b>P</b><p>{{ encounter.chart.plan or "未作成" }}</p></div>
+      {% if encounter.chart.handoff %}<div class="soap-line"><b>申し送り</b><p>{{ encounter.chart.handoff }}</p></div>{% endif %}
+    </section>
+    <footer class="mt-8 pt-5 border-t border-slate-300 flex justify-end gap-3 no-print">
+      <a class="btn-secondary" href="/encounters/{{ encounter.id }}">戻る</a>
+      <a class="btn-secondary" href="/encounters/{{ encounter.id }}/chart/edit">編集する</a>
+      <button class="btn-secondary" onclick="window.print()">PDFとして保存</button>
+      <form method="post" action="/encounters/{{ encounter.id }}/confirm"><button class="btn-primary">確定・完了</button></form>
+    </footer>
+  </div>
+</div>
+</div>
+{% endblock %}

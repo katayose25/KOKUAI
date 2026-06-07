@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}カルテ編集{% endblock %}
+{% block body %}
+<div class="h-full overflow-y-auto bg-slate-100">
+<div class="max-w-4xl mx-auto p-6 lg:p-10">
+  <h2 class="text-3xl font-bold mb-6">カルテ編集</h2>
+  <form method="post" action="/encounters/{{ encounter.id }}/chart/save" class="panel p-6 space-y-4">
+    <label class="field">S<textarea name="subjective" rows="4" class="input">{{ encounter.chart.subjective }}</textarea></label>
+    <label class="field">O<textarea name="objective" rows="4" class="input">{{ encounter.chart.objective }}</textarea></label>
+    <label class="field">A<textarea name="assessment" rows="4" class="input">{{ encounter.chart.assessment }}</textarea></label>
+    <label class="field">P<textarea name="plan" rows="4" class="input">{{ encounter.chart.plan }}</textarea></label>
+    <label class="field">申し送り<textarea name="handoff" rows="3" class="input">{{ encounter.chart.handoff }}</textarea></label>
+    <div class="flex justify-end gap-3"><a class="btn-secondary" href="/encounters/{{ encounter.id }}">戻る</a><button class="btn-primary">保存</button></div>
+  </form>
+</div>
+</div>
+{% endblock %}

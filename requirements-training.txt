@@ -1,0 +1,19 @@
+datasets>=3.0
+wandb>=0.17
+numpy>=1.26
+requests>=2.31
+soundfile>=0.12
+
+# Training/evaluation scripts use LFM2.5-Audio, PyTorch, and torchaudio.
+# For CUDA environments, install matching torch/torchaudio wheels if needed.
+torch>=2.5
+torchaudio>=2.5
+transformers>=4.52
+accelerate>=1.0
+sentencepiece>=0.2
+librosa>=0.10
+torchcodec>=0.1
+liquid-audio>=1.2.0
+huggingface-hub>=0.30
+peft>=0.13
+safetensors>=0.4

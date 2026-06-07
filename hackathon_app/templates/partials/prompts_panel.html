@@ -1,0 +1,13 @@
+<section id="prompts-panel" class="panel h-[520px] flex flex-col overflow-hidden">
+  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+    <h3 class="font-bold">診療プロンプト</h3>
+    <span class="text-xs text-slate-500">Clinical Prompts</span>
+  </div>
+  <div id="prompts-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+    {% for prompt in encounter.clinical_prompts %}
+    <article class="prompt-row priority-{{ prompt.priority }}" data-prompt-key="{{ prompt.kind }}:{{ prompt.title }}"><strong>{{ prompt_labels.get(prompt.kind, prompt.kind.upper()) }}: {{ prompt.title }}</strong><p>{{ prompt.detail }}</p></article>
+    {% else %}
+    <div class="empty-state">会話から確認事項や注意所見を逐次抽出します。</div>
+    {% endfor %}
+  </div>
+</section>

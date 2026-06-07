@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}KOKU AI{% endblock %}</title>
+  <link rel="icon" type="image/png" href="/images/kokuai_logo_only.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link rel="stylesheet" href="/static/app.css?v=20260607a">
+  <script src="/static/app.js?v=20260607a" defer></script>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-slate-100 text-slate-900">
+
+  <!-- Global dark header -->
+  <header class="app-global-header">
+    <div class="app-header-brand">
+      <img src="/images/kokuai_logo_only.png" alt="" class="h-6 w-6 opacity-90">
+      <div class="flex items-baseline gap-2">
+        <span class="app-header-title">KOKU AI</span>
+        <span class="app-header-subtitle">Disaster Medicine</span>
+      </div>
+    </div>
+    <div class="app-header-counts">
+      <span class="triage-hcount red">RED <b id="cnt-red">—</b></span>
+      <span class="triage-hcount yellow">YELLOW <b id="cnt-yellow">—</b></span>
+      <span class="triage-hcount green">GREEN <b id="cnt-green">—</b></span>
+      <span class="triage-hcount black">BLACK <b id="cnt-black">—</b></span>
+    </div>
+    <div class="app-header-right">
+      経過患者 <b id="cnt-total">—</b>
+    </div>
+  </header>
+
+  <!-- Body area -->
+  <div class="flex-1 min-h-0 overflow-hidden">
+    {% block body %}{% endblock %}
+  </div>
+
+  <script>
+    (function () {
+      function refreshCounts() {
+        fetch('/api/triage-counts').then(function(r) { return r.json(); }).then(function(d) {
+          ['red','yellow','green','black'].forEach(function(c) {
+            var el = document.getElementById('cnt-' + c);
+            if (el) el.textContent = d[c] != null ? d[c] : 0;
+          });
+          var tot = document.getElementById('cnt-total');
+          if (tot) tot.textContent = d.total != null ? d.total : 0;
+        }).catch(function() {});
+      }
+      refreshCounts();
+      setInterval(refreshCounts, 15000);
+    })();
+  </script>
+</body>
+</html>

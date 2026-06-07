@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+
+# Secrets / local config
+.env
+*.env
+!.env.example
+.netrc
+
+# Runtime storage
+hackathon_app/storage/db.json
+hackathon_app/storage/uploads/
+logs/
+wandb/
+
+# Large generated artifacts
+data/
+checkpoints/
+demo_audio/
+*.pt
+*.pth
+*.safetensors
+*.bin
+*.wav
+*.mp3
+*.m4a
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+# Local design backups
+*.before_*

@@ -1,0 +1,13 @@
+<section id="transcript-panel" class="panel h-[520px] flex flex-col overflow-hidden">
+  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+    <h3 class="font-bold">ライブ文字起こし</h3>
+    <span class="text-xs text-slate-500">Live Transcript</span>
+  </div>
+  <div id="transcript-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+    {% for turn in encounter.transcript %}
+    <article class="turn-row {{ turn.speaker }}" data-start="{{ turn.start or 0 }}" data-end="{{ turn.end or 0 }}"><span>{{ speaker_labels.get(turn.speaker, "不明") }}</span><p>{{ turn.text }}</p></article>
+    {% else %}
+    <div class="empty-state">Live ASRを開始すると、ここに会話が流れます。</div>
+    {% endfor %}
+  </div>
+</section>

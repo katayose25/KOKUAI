@@ -1,0 +1,15 @@
+<div class="grid grid-cols-[1.4fr_.8fr_1.4fr_1fr_.8fr] gap-4 px-5 py-4 items-center hover:bg-slate-50">
+  <div>
+    <div class="font-semibold">{{ row.patient.name }}</div>
+    <div class="text-xs text-slate-500">{{ row.patient.age }}歳 / {{ {"male":"男性","female":"女性","other":"その他","unknown":"不明"}[row.patient.sex] }} ・ 第{{ row.encounter_number }}回</div>
+  </div>
+  <div><span class="badge {{ row.category_badge }}">{{ row.category_label }}</span></div>
+  <div class="truncate text-sm">{{ row.patient.chief_complaint or "未入力" }}</div>
+  <div class="text-sm text-slate-700">{{ row.status_label }}</div>
+  <div class="flex justify-end gap-2">
+    {% if row.encounter %}<a class="btn-secondary" href="/encounters/{{ row.encounter.id }}">開く</a>{% endif %}
+    <form method="post" action="/patients/{{ row.patient.id }}/delete" onsubmit="return confirm('{{ row.patient.name }}さんの全データを削除しますか？')">
+      <button class="btn-danger">削除</button>
+    </form>
+  </div>
+</div>

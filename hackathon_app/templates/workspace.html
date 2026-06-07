@@ -1,0 +1,172 @@
+{% extends "layout.html" %}
+{% block title %}{% if patient %}{{ patient.name }} — {% endif %}KOKU AI{% endblock %}
+{% block body %}
+<div class="ws-layout" data-encounter-id="{{ encounter.id if encounter else '' }}">
+
+  <!-- ▌Left: Patient list -->
+  <aside class="ws-patient-list">
+    <div class="ws-list-header">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">患者一覧</span>
+      <button class="ws-new-btn" onclick="document.getElementById('ws-quick-reg').classList.toggle('open')">＋ 新規</button>
+    </div>
+
+    <!-- Quick registration form -->
+    <div id="ws-quick-reg" class="ws-quick-reg{% if auto_open_reg %} open{% endif %}">
+      <form method="post" action="/patients" class="ws-quick-form">
+        <input type="hidden" name="category" value="other">
+        <input type="hidden" name="chief_complaint" value="">
+        <input type="hidden" name="memo" value="">
+        <div class="ws-qf-row">
+          <label class="ws-qf-label">名前</label>
+          <input type="text" name="name" placeholder="不明" value="" class="ws-qf-input" required>
+        </div>
+        <div class="ws-qf-row">
+          <label class="ws-qf-label">年齢</label>
+          <input type="number" name="age" min="0" max="120" placeholder="—" class="ws-qf-input ws-qf-age" required>
+        </div>
+        <div class="ws-qf-row">
+          <label class="ws-qf-label">性別</label>
+          <select name="sex" class="ws-qf-input">
+            <option value="unknown">不明</option>
+            <option value="male">男</option>
+            <option value="female">女</option>
+            <option value="other">他</option>
+          </select>
+        </div>
+        <div class="ws-qf-actions">
+          <button type="submit" class="ws-qf-submit">受付</button>
+          <button type="button" class="ws-qf-cancel" onclick="document.getElementById('ws-quick-reg').classList.remove('open')">取消</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="ws-list-scroll">
+      {% for p in all_patients %}
+      {% set enc = all_encounters.get(p.id) %}
+      <div class="ws-patient-item {% if patient and p.id == patient.id %}active{% endif %}">
+        <a href="{{ '/encounters/' + enc.id if enc else '/' }}" class="ws-patient-meta">
+          <span class="ws-patient-name">{{ p.name }}</span>
+          <span class="ws-patient-sub">{{ p.age }}歳 · {{ {"male":"男","female":"女","other":"他","unknown":"不明"}[p.sex] }}</span>
+        </a>
+        <form method="post" action="/patients/{{ p.id }}/delete"
+              onsubmit="return confirm('{{ p.name }}を削除しますか？')">
+          <button class="ws-patient-del" title="削除">✕</button>
+        </form>
+      </div>
+      {% else %}
+      <div class="ws-list-empty">患者なし</div>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <!-- ▌Center: Main workspace -->
+  <main class="ws-main">
+  {% if encounter %}
+
+    <!-- Audio section -->
+    <section class="ws-card ws-audio-card">
+      <div class="ws-card-head">
+        <div class="flex items-center gap-3">
+          <h3 class="ws-card-title">音声入力</h3>
+          <span id="stream-status" class="status-pill">待機中</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap justify-end">
+          <span id="model-status" class="status-pill text-xs">モデル準備中...</span>
+          <button id="start-live-asr" class="btn-primary text-sm" disabled>文字起こし開始</button>
+          <button id="stop-live-asr" class="btn-secondary text-sm" disabled>停止</button>
+        </div>
+      </div>
+      <div>{% include "partials/audio_panel.html" %}</div>
+    </section>
+
+    <!-- Transcript section -->
+    <section class="ws-card ws-transcript-card">
+      <div class="ws-card-head">
+        <h3 class="ws-card-title">ライブ文字起こし <span class="text-xs font-normal text-slate-400 ml-1">{{ encounter.transcript|length }} turns</span></h3>
+        <form method="post" action="/encounters/{{ encounter.id }}/transcript/clear">
+          <button class="btn-danger py-1 text-xs">クリア</button>
+        </form>
+      </div>
+      <div id="transcript-list" class="ws-transcript-list">
+        {% for turn in encounter.transcript %}
+        <article class="turn-row {{ turn.speaker }}" data-start="{{ turn.start or 0 }}" data-end="{{ turn.end or 0 }}">
+          <span>{{ speaker_labels.get(turn.speaker, "不明") }}</span>
+          <p>{{ turn.text }}</p>
+        </article>
+        {% else %}
+        <div class="empty-state">Live ASRを開始すると、ここに会話が流れます。</div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Bottom: VLM -->
+    <div id="vlm-panel">{% include "partials/vlm_panel.html" %}</div>
+
+  {% else %}
+    <div class="ws-empty-state">
+      <p>← 新規ボタンから患者を受付してください</p>
+    </div>
+  {% endif %}
+  </main>
+
+  <!-- ▌Right: Triage panel -->
+  <aside class="ws-triage-panel">
+  {% if encounter %}
+
+    <!-- Compact triage card -->
+    <div class="ws-triage-card ws-triage-card-sm triage-{{ triage.tone }}">
+      <div class="ws-triage-level">{{ triage.level }}</div>
+      <div class="ws-triage-label">{{ triage.label }}</div>
+    </div>
+
+    <!-- Checks grid -->
+    <div class="triage-checks ws-triage-checks">
+      {% for c in triage.checks %}
+      <div class="triage-check {{ c.flag if c is mapping else c.flag }}">
+        <span>{{ c.name if c is mapping else c.name }}</span>
+        <b>{{ c.value if c is mapping else c.value }}</b>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Reason / hits -->
+    {% if triage.hits %}
+    <div class="ws-triage-reason">
+      <div class="triage-hit-list">
+        {% for h in triage.hits %}<span>{{ h }}</span>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- SOAP preview (full, inline) -->
+    {% if encounter.chart.subjective or encounter.chart.assessment %}
+    <div class="ws-soap-preview">
+      <div class="ws-soap-preview-head">
+        <h3 class="ws-card-title">作成カルテ</h3>
+        <div class="flex gap-2">
+          <a href="/encounters/{{ encounter.id }}/chart/edit" class="ws-soap-link">編集</a>
+          <a href="/encounters/{{ encounter.id }}/chart" class="ws-soap-link">別ページ →</a>
+        </div>
+      </div>
+      <dl class="ws-soap-dl">
+        {% if encounter.chart.subjective %}<dt>S</dt><dd>{{ encounter.chart.subjective }}</dd>{% endif %}
+        {% if encounter.chart.objective  %}<dt>O</dt><dd>{{ encounter.chart.objective }}</dd>{% endif %}
+        {% if encounter.chart.assessment %}<dt>A</dt><dd>{{ encounter.chart.assessment }}</dd>{% endif %}
+        {% if encounter.chart.plan      %}<dt>P</dt><dd>{{ encounter.chart.plan }}</dd>{% endif %}
+        {% if encounter.chart.handoff   %}<dt>申送</dt><dd>{{ encounter.chart.handoff }}</dd>{% endif %}
+      </dl>
+    </div>
+    {% endif %}
+
+    <!-- Actions: pinned to bottom -->
+    <div class="ws-triage-actions">
+      <form method="post" action="/encounters/{{ encounter.id }}/soap">
+        <button id="create-soap" class="btn-dark w-full" disabled>🩺 カルテ作成</button>
+      </form>
+    </div>
+
+  {% endif %}
+  </aside>
+
+</div>
+{% endblock %}
