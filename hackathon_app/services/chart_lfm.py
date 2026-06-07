@@ -63,13 +63,34 @@ def generate_soap_with_lfm(
     generated = tokenizer.decode(output_ids[0][input_len:], skip_special_tokens=True)
     data = _extract_json(generated)
     return ChartDraft(
-        subjective=str(data.get("subjective", "")).strip(),
-        objective=str(data.get("objective", "")).strip(),
-        assessment=str(data.get("assessment", "")).strip(),
-        plan=str(data.get("plan", "")).strip(),
-        handoff=str(data.get("handoff", "")).strip(),
+        subjective=_field_text(data.get("subjective", "")),
+        objective=_field_text(data.get("objective", "")),
+        assessment=_field_text(data.get("assessment", "")),
+        plan=_field_text(data.get("plan", "")),
+        handoff=_field_text(data.get("handoff", "")),
     )
 
+
+
+def _field_text(value: Any) -> str:
+    """Normalize model JSON fields into displayable Japanese text."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, dict):
+        if "note" in value and len(value) == 1:
+            return str(value["note"]).strip()
+        parts = []
+        for key, item in value.items():
+            text = _field_text(item)
+            if text:
+                parts.append(f"{key}: {text}")
+        return "。".join(parts).strip()
+    if isinstance(value, list):
+        parts = [_field_text(item) for item in value]
+        return "。".join(part for part in parts if part).strip()
+    return str(value).strip()
 
 def _encode_prompt(tokenizer: Any, prompt: str, device: str) -> dict[str, Any]:
     messages = [
