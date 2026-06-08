@@ -79,19 +79,6 @@ Rules:
 - Preserve each turn's start/end timestamp.
 - Save speaker ids and speaker names.
 
-Example command:
-
-```bash
-python scripts/synthesize_gousei_with_voicevox.py \
-  --input data/gousei/dataset_clean.jsonl \
-  --output-audio-root data/gousei/voicevox_audio_random_safe_timed \
-  --output-manifest data/manifests/gousei_voicevox_random_safe_timed.jsonl \
-  --engine-url http://127.0.0.1:50021 \
-  --randomize-speakers \
-  --speaker-pool 8,10,11,12,14,16,21,23,47,52,53,67,69,74,99,100,107,108,109,118,122 \
-  --seed 23
-```
-
 The output manifest keeps `turns[]` with timestamps.
 
 ## 4. Chunking Method
