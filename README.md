@@ -1,4 +1,4 @@
-# KokuAI Disaster Medicine Demo
+# KOKUAI Disaster Medicine Demo
 
 KokuAI is a hackathon prototype for disaster-medical triage support. It provides a local web application for audio transcription, clinical prompt extraction, chart drafting, and rule-based triage support.
 
